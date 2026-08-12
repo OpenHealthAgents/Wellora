@@ -45,16 +45,28 @@ export default function AppHeader({ activePath = "" }: { activePath?: string }) 
             );
           })}
           {session && (
-            <Link
-              href="/dashboard"
-              className={`transition-colors hover:text-emerald-600 dark:hover:text-emerald-450 ${
-                activePath === "/dashboard"
-                  ? "text-emerald-600 dark:text-emerald-400 font-bold"
-                  : "text-zinc-650 dark:text-zinc-350"
-              }`}
-            >
-              Dashboard
-            </Link>
+            <>
+              <Link
+                href="/onboarding"
+                className={`transition-colors hover:text-emerald-600 dark:hover:text-emerald-450 ${
+                  activePath === "/onboarding"
+                    ? "text-emerald-600 dark:text-emerald-400 font-bold"
+                    : "text-zinc-650 dark:text-zinc-350"
+                }`}
+              >
+                Onboarding
+              </Link>
+              <Link
+                href="/dashboard"
+                className={`transition-colors hover:text-emerald-600 dark:hover:text-emerald-450 ${
+                  activePath === "/dashboard"
+                    ? "text-emerald-600 dark:text-emerald-400 font-bold"
+                    : "text-zinc-650 dark:text-zinc-350"
+                }`}
+              >
+                Dashboard
+              </Link>
+            </>
           )}
         </nav>
 
@@ -112,15 +124,26 @@ export default function AppHeader({ activePath = "" }: { activePath?: string }) 
               );
             })}
             {session && (
-              <Link
-                href="/dashboard"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm font-bold block py-1.5 transition-colors hover:text-emerald-600 dark:hover:text-emerald-450 ${
-                  activePath === "/dashboard" ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-600 dark:text-zinc-400"
-                }`}
-              >
-                Dashboard
-              </Link>
+              <>
+                <Link
+                  href="/onboarding"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-sm font-bold block py-1.5 transition-colors hover:text-emerald-600 dark:hover:text-emerald-450 ${
+                    activePath === "/onboarding" ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-600 dark:text-zinc-400"
+                  }`}
+                >
+                  Onboarding
+                </Link>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-sm font-bold block py-1.5 transition-colors hover:text-emerald-600 dark:hover:text-emerald-450 ${
+                    activePath === "/dashboard" ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-600 dark:text-zinc-400"
+                  }`}
+                >
+                  Dashboard
+                </Link>
+              </>
             )}
             
             {/* Mobile Get Started CTA */}
