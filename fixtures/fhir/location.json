@@ -1,0 +1,21 @@
+{
+  "resourceType": "Location",
+  "id": "loc-virtual-123",
+  "status": "active",
+  "name": "DrGodly Telehealth Clinic",
+  "description": "Virtual consulting rooms",
+  "mode": "instance",
+  "address": {
+    "text": "100 Web Way",
+    "line": [
+      "100 Web Way"
+    ],
+    "city": "San Francisco",
+    "state": "CA",
+    "postalCode": "94107",
+    "country": "US"
+  },
+  "managingOrganization": {
+    "reference": "Organization/org-wellora-123"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "resourceType": "HealthcareService",
+  "id": "srv-video-123",
+  "active": true,
+  "name": "Video Consultation",
+  "type": [
+    {
+      "text": "video"
+    }
+  ]
+}

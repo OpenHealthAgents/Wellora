@@ -1,0 +1,410 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  name          String?
+  emailVerified Boolean      @default(false)
+  image         String?
+  role          String       @default("user")
+  banned        Boolean      @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  eligibility   Eligibility?
+  intake        Intake?
+  orders        Order[]
+  accounts      Account[]
+  sessions      Session[]
+  practitioner  Practitioner?
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  impersonatedBy String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model PendingIntake {
+  id          String   @id @default(cuid())
+  sessionId   String   @unique
+  userId      String?
+  currentStep String   @default("height")
+  data        Json     @default("{}")
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+
+  @@index([sessionId])
+}
+
+model Intake {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  firstName      String
+  lastName       String
+  email          String
+  phone          String
+  shippingState  String
+  height         Float
+  weight         Float
+  goalWeight     Float
+  gender         String
+  dateOfBirth    DateTime
+  healthData     Json
+  history        Json
+  preferences    Json
+  additionalInfo String?
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id])
+}
+
+model Eligibility {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  status    String
+  reason    String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Product {
+  id               String   @id @default(cuid())
+  name             String
+  activeIngredient String?
+  manufacturer     String?
+  description      String
+  image            String?
+  formFactor       String
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  plans            Plan[]
+}
+
+model Plan {
+  id             String  @id @default(cuid())
+  productId      String
+  drugType       String
+  tier           String
+  durationMonths Int
+  isActive       Boolean @default(true)
+  orders         Order[]
+  prices         PlanPrice[]
+  product        Product @relation(fields: [productId], references: [id])
+}
+
+model PlanPrice {
+  id        String   @id @default(cuid())
+  planId    String
+  country   String
+  currency  String
+  amount    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  plan      Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, country])
+  @@index([country])
+}
+
+model Order {
+  id                   String   @id @default(cuid())
+  userId               String
+  planId               String
+  status               String
+  razorpayOrderId      String?  @unique
+  razorpayPaymentId    String?  @unique
+  razorpaySignature    String?
+  createdAt            DateTime @default(now())
+  plan                 Plan     @relation(fields: [planId], references: [id])
+  user                 User     @relation(fields: [userId], references: [id])
+}
+
+model TrustContent {
+  id          String   @id @default(cuid())
+  type        String
+  title       String
+  description String
+  metadata    Json
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  details    String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([resource, resourceId])
+}
+
+enum OnboardingStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  CHANGES_REQUESTED
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+model Practitioner {
+  id                     String                      @id @default(cuid())
+  userId                 String                      @unique
+  user                   User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status                 OnboardingStatus            @default(DRAFT)
+  title                  String                      @default("Dr.")
+  firstName              String
+  middleName             String?
+  lastName               String
+  displayName            String
+  gender                 String
+  birthDate              DateTime
+  profilePhoto           String?
+  phone                  String                      @unique
+  email                  String                      @unique
+  alternatePhone         String?
+  preferredContactMethod String                      @default("email")
+  professionalBio        String?
+  yearsOfExperience      Int                         @default(0)
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
+  submittedAt            DateTime?
+  verifiedAt             DateTime?
+
+  identifiers            PractitionerIdentifier[]
+  qualifications         PractitionerQualification[]
+  specialties            PractitionerSpecialty[]
+  roles                  PractitionerRole[]
+  languages              PractitionerLanguage[]
+  documents              VerificationDocument[]
+  consents               PractitionerConsent[]
+  services               PractitionerService[]
+}
+
+model PractitionerIdentifier {
+  id                 String       @id @default(cuid())
+  practitionerId     String
+  system             String       // e.g. "http://hl7.org/fhir/sid/us-npi"
+  value              String
+  type               String       // NPI, StateLicense, etc.
+  use                String?      // official, usual, secondary
+  issuer             String?
+  periodStart        DateTime?
+  periodEnd          DateTime?
+  verificationStatus String       @default("pending") // pending, verified, rejected
+  practitioner       Practitioner @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+
+  @@unique([system, value])
+}
+
+model PractitionerQualification {
+  id                  String       @id @default(cuid())
+  practitionerId      String
+  qualificationType   String       // UG, PG, Diploma, etc.
+  degreeName          String       // e.g. MD, MBBS
+  specialization      String?
+  institution         String
+  issuingOrganization String
+  country             String
+  completionDate      DateTime
+  certificateNumber   String
+  verificationStatus  String       @default("pending") // pending, verified, rejected
+  practitioner        Practitioner @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+}
+
+model PractitionerSpecialty {
+  id               String       @id @default(cuid())
+  practitionerId   String
+  specialtyCode    String       // SNOMED code
+  specialtySystem  String       // SNOMED system URL
+  specialtyDisplay String
+  isPrimary        Boolean      @default(false)
+  practitioner     Practitioner @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+}
+
+model Organization {
+  id        String             @id @default(cuid())
+  name      String
+  active    Boolean            @default(true)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  roles     PractitionerRole[]
+}
+
+model Location {
+  id         String                     @id @default(cuid())
+  name       String
+  address    String
+  city       String
+  state      String
+  postalCode String
+  country    String
+  active     Boolean                    @default(true)
+  createdAt  DateTime                   @default(now())
+  updatedAt  DateTime                   @updatedAt
+  roleLinks  PractitionerRoleLocation[]
+}
+
+model PractitionerRole {
+  id             String                     @id @default(cuid())
+  practitionerId String
+  organizationId String
+  designation    String
+  department     String?
+  roleCode       String                     @default("doctor")
+  roleDisplay    String                     @default("Physician")
+  startDate      DateTime                   @default(now())
+  endDate        DateTime?
+  active         Boolean                    @default(true)
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+
+  practitioner   Practitioner               @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+  organization   Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  locations      PractitionerRoleLocation[]
+  availabilities PractitionerAvailability[]
+  services       PractitionerService[]
+}
+
+model PractitionerRoleLocation {
+  id         String           @id @default(cuid())
+  roleId     String
+  locationId String
+  role       PractitionerRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  location   Location         @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, locationId])
+}
+
+model PractitionerService {
+  id               String            @id @default(cuid())
+  practitionerId   String
+  roleId           String?
+  serviceCode      String            // SNOMED or platform code
+  serviceName      String            // Video Consult, Chat Consult, etc.
+  consultationMode String            // video, audio, chat, offline
+  duration         Int               // minutes
+  fee              Float
+  currency         String            @default("INR")
+  active           Boolean           @default(true)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  practitioner     Practitioner      @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+  role             PractitionerRole? @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+model PractitionerLanguage {
+  id                       String       @id @default(cuid())
+  practitionerId           String
+  languageCode             String       // ISO 639-1
+  languageName             String
+  proficiency              String       // native, fluent, intermediate, basic
+  preferredForConsultation Boolean      @default(false)
+  practitioner             Practitioner @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+}
+
+model PractitionerAvailability {
+  id                         String           @id @default(cuid())
+  roleId                     String
+  dayOfWeek                  String           // MON, TUE, WED, THU, FRI, SAT, SUN
+  availableFrom              String           // e.g. "09:00"
+  availableTo                String           // e.g. "17:00"
+  timezone                   String           @default("Asia/Kolkata")
+  appointmentDurationMinutes Int              @default(15)
+  bufferMinutes              Int              @default(5)
+  active                     Boolean          @default(true)
+  role                       PractitionerRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+}
+
+model VerificationDocument {
+  id                 String       @id @default(cuid())
+  practitionerId     String
+  title              String       // e.g. Medical License Document, MD Diploma
+  url                String       // simulated upload url
+  status             String       @default("current") // current, superseded
+  docType            String       // license, qualification, identity
+  fileName           String?
+  mimeType           String?
+  fileSize           Int?
+  uploadedAt         DateTime     @default(now())
+  verificationStatus String       @default("pending") // pending, approved, rejected
+  verifiedAt         DateTime?
+  verifiedBy         String?
+  rejectionReason    String?
+  practitioner       Practitioner @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+}
+
+model PractitionerConsent {
+  id             String       @id @default(cuid())
+  practitionerId String
+  consentType    String       // platformTerms, privacyPolicy, telemedicine, etc.
+  version        String
+  accepted       Boolean      @default(true)
+  acceptedAt     DateTime     @default(now())
+  acceptedBy     String       // User ID
+  practitioner   Practitioner @relation(fields: [practitionerId], references: [id], onDelete: Cascade)
+}
+
+model HealthcareService {
+  id        String             @id @default(cuid())
+  name      String             // e.g. Video Consultation, Chat Consultation, Prescription Renewal
+  type      String             // Consultation, Service
+  active    Boolean            @default(true)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}

@@ -1,0 +1,42 @@
+{
+  "resourceType": "PractitionerRole",
+  "id": "role-physician-123",
+  "active": true,
+  "practitioner": {
+    "reference": "Practitioner/practitioner-alexis-123"
+  },
+  "organization": {
+    "reference": "Organization/org-wellora-123"
+  },
+  "location": [
+    {
+      "reference": "Location/loc-virtual-123"
+    }
+  ],
+  "healthcareService": [
+    {
+      "reference": "HealthcareService/srv-video-123"
+    }
+  ],
+  "specialty": [
+    {
+      "coding": [
+        {
+          "system": "http://snomed.info/sct",
+          "code": "408443003",
+          "display": "General practice"
+        }
+      ],
+      "text": "General practice"
+    }
+  ],
+  "availableTime": [
+    {
+      "daysOfWeek": [
+        "mon"
+      ],
+      "availableStartTime": "09:00",
+      "availableEndTime": "17:00"
+    }
+  ]
+}

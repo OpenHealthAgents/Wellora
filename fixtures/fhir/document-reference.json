@@ -1,0 +1,21 @@
+{
+  "resourceType": "DocumentReference",
+  "id": "doc-license-123",
+  "status": "current",
+  "type": {
+    "text": "license"
+  },
+  "subject": {
+    "reference": "Practitioner/practitioner-alexis-123"
+  },
+  "content": [
+    {
+      "attachment": {
+        "url": "https://drgodly.com/uploads/license.pdf",
+        "title": "State Medical License",
+        "contentType": "application/pdf",
+        "size": 1048576
+      }
+    }
+  ]
+}
