@@ -9,9 +9,7 @@ import { getDetectedRegion } from "@/lib/region-server";
 import { getLowestEntryPriceLabel } from "@/lib/pricing-strategy";
 import { getSiteUrl } from "@/lib/site";
 import PricingCatalog from "@/components/PricingCatalog";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { LoginButton } from "@/components/LoginButton";
+import AppHeader from "@/components/AppHeader";
 
 export const metadata: Metadata = {
   title: "Doctor-Guided GLP-1 Weight Loss Treatment in India",
@@ -43,10 +41,6 @@ export const metadata: Metadata = {
 };
 
 export default async function LandingPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  }).catch(() => null);
-
   // Landing-page pricing is region-aware so the first number the user sees is not hardcoded.
   const region = await getDetectedRegion();
   const startingPrice = getLowestEntryPriceLabel(region.country, region.locale);
@@ -92,32 +86,7 @@ export default async function LandingPage() {
         }}
       />
       {/* Navigation */}
-      <header className="fixed top-0 z-50 w-full border-b border-zinc-100 bg-white/80 backdrop-blur-md dark:border-zinc-900 dark:bg-black/80">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <DrGodlyLogo />
-          <nav className="hidden items-center gap-8 text-sm font-medium sm:flex">
-            <Link href="#how-it-works" className="hover:text-zinc-500">How it Works</Link>
-            <Link href="#pricing" className="hover:text-zinc-500">Pricing</Link>
-            <Link href="#about-us" className="hover:text-zinc-500">About Us</Link>
-            <Link href="/directory" className="hover:text-zinc-500">Find a Doctor</Link>
-            <Link href="/blogs" className="hover:text-zinc-500">Blogs</Link>
-            <Link href="/events" className="hover:text-zinc-500">Events</Link>
-            {session && <Link href="/dashboard" className="hover:text-zinc-500">Dashboard</Link>}
-          </nav>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <LoginButton />
-            {!session && (
-              <Link
-                href="/intake"
-                className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95 dark:bg-zinc-100 dark:text-zinc-900"
-              >
-                Get Started
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+      <AppHeader activePath="/" />
 
       {/* Hero Section */}
       <section className="relative flex min-h-screen items-center justify-center overflow-hidden pt-16">

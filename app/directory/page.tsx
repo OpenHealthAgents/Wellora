@@ -7,8 +7,7 @@ import {
   ShieldCheck, BookOpen, Heart, Clock, User, DollarSign, 
   Video, PhoneCall, MessageSquare, BadgeAlert, Layers, Copy, Check, X, ArrowLeft
 } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { DrGodlyLogo } from "@/components/DrGodlyLogo";
+import AppHeader from "@/components/AppHeader";
 
 interface Provider {
   id: string;
@@ -147,27 +146,7 @@ export default function DirectoryPage() {
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       {/* Header Navigation */}
-      <header className="fixed top-0 z-40 w-full border-b border-zinc-200/80 bg-white/80 backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/80">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <DrGodlyLogo />
-          <nav className="hidden items-center gap-8 text-sm font-medium sm:flex">
-            <Link href="/" className="hover:text-emerald-600 transition-colors">Home</Link>
-            <Link href="/directory" className="text-emerald-600 font-bold">Find a Doctor</Link>
-            <Link href="/blogs" className="hover:text-emerald-600 transition-colors">Blogs</Link>
-            <Link href="/events" className="hover:text-emerald-600 transition-colors">Events</Link>
-            <Link href="/dashboard" className="hover:text-emerald-600 transition-colors">Dashboard</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <Link
-              href="/intake"
-              className="rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all"
-            >
-              Start Intake
-            </Link>
-          </div>
-        </div>
-      </header>
+      <AppHeader activePath="/directory" />
 
       {/* Main Container */}
       <main className="mx-auto max-w-7xl px-4 py-24 sm:px-6">
