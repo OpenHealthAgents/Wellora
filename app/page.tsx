@@ -9,6 +9,9 @@ import { getDetectedRegion } from "@/lib/region-server";
 import { getLowestEntryPriceLabel } from "@/lib/pricing-strategy";
 import { getSiteUrl } from "@/lib/site";
 import PricingCatalog from "@/components/PricingCatalog";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { LoginButton } from "@/components/LoginButton";
 
 export const metadata: Metadata = {
   title: "Doctor-Guided GLP-1 Weight Loss Treatment in India",
@@ -40,6 +43,10 @@ export const metadata: Metadata = {
 };
 
 export default async function LandingPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  }).catch(() => null);
+
   // Landing-page pricing is region-aware so the first number the user sees is not hardcoded.
   const region = await getDetectedRegion();
   const startingPrice = getLowestEntryPriceLabel(region.country, region.locale);
@@ -95,16 +102,19 @@ export default async function LandingPage() {
             <Link href="/directory" className="hover:text-zinc-500">Find a Doctor</Link>
             <Link href="/blogs" className="hover:text-zinc-500">Blogs</Link>
             <Link href="/events" className="hover:text-zinc-500">Events</Link>
-            <Link href="/dashboard" className="hover:text-zinc-500">Dashboard</Link>
+            {session && <Link href="/dashboard" className="hover:text-zinc-500">Dashboard</Link>}
           </nav>
           <div className="flex items-center gap-4">
             <ThemeToggle />
-            <Link
-              href="/intake"
-              className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95 dark:bg-zinc-100 dark:text-zinc-900"
-            >
-              Get Started
-            </Link>
+            <LoginButton />
+            {!session && (
+              <Link
+                href="/intake"
+                className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95 dark:bg-zinc-100 dark:text-zinc-900"
+              >
+                Get Started
+              </Link>
+            )}
           </div>
         </div>
       </header>
